@@ -1,0 +1,80 @@
+# .github/workflows/cd.yml
+# ─────────────────────────────────────────────────────────────
+# CONTINUOUS DEPLOYMENT (CD)
+#
+# Runs ONLY when code is pushed or merged into the 'main' branch:
+#   1. Authenticates securely with AWS using GitHub Secrets
+#   2. Logs in to AWS ECR
+#   3. Builds all 3 Docker container images
+#   4. Pushes the Docker images to AWS ECR
+#   5. Runs Terraform Init & Apply with auto-approval
+# ─────────────────────────────────────────────────────────────
+
+name: CD - Build & Deploy to AWS
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    name: Build Docker Images & Deploy via Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Extractor Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./lambdas/extractor
+          platforms: linux/amd64
+          provenance: false
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/feedback-tickets-extractor:latest
+
+      - name: Build and Push Transformer Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./lambdas/transformer
+          platforms: linux/amd64
+          provenance: false
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/feedback-tickets-transformer:latest
+
+      - name: Build and Push Loader Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./lambdas/loader
+          platforms: linux/amd64
+          provenance: false
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/feedback-tickets-loader:latest
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
