@@ -1,14 +1,4 @@
 # .github/workflows/ci.yml
-# ─────────────────────────────────────────────────────────────
-# CONTINUOUS INTEGRATION (CI)
-#
-# Runs on every Pull Request and push to verify:
-#   1. Python unit tests pass (pytest)
-#   2. Python syntax formatting & linting (flake8)
-#   3. Terraform syntax formatting (terraform fmt)
-#   4. Terraform configuration validity (terraform validate)
-# ─────────────────────────────────────────────────────────────
-
 name: CI - Code Quality & Testing
 
 on:
@@ -34,13 +24,11 @@ jobs:
       - name: Install Test Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest flake8
+          pip install pytest flake8 boto3
 
       - name: Lint Code with Flake8
         run: |
-          # Stop build if there are Python syntax errors or undefined names
           flake8 lambdas/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Treat all errors as warnings for line length
           flake8 lambdas/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Run Pytest Unit Tests
