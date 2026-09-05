@@ -32,6 +32,10 @@ jobs:
           flake8 lambdas/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Run Pytest Unit Tests
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: testing-mock-key
+          AWS_SECRET_ACCESS_KEY: testing-mock-secret
         run: |
           pytest tests/ -v
 
