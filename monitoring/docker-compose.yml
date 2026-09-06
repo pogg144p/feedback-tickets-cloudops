@@ -1,17 +1,4 @@
 # monitoring/docker-compose.yml
-# ─────────────────────────────────────────────────────────────
-# Observability Stack: Prometheus + Pushgateway + Grafana
-#
-# Run with: docker compose up -d
-#
-# Ports:
-#   • Prometheus:   http://localhost:9090
-#   • Pushgateway:  http://localhost:9091
-#   • Grafana:      http://localhost:3000 (admin / admin)
-# ─────────────────────────────────────────────────────────────
-
-version: '3.8'
-
 services:
   pushgateway:
     image: prom/pushgateway:v1.9.0
@@ -53,7 +40,7 @@ services:
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./dashboards:/etc/grafana/provisioning/dashboards/json:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - prometheus
     networks:

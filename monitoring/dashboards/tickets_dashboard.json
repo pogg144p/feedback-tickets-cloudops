@@ -46,8 +46,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 8,
+        "h": 7,
+        "w": 7,
         "x": 0,
         "y": 1
       },
@@ -66,7 +66,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "10.0.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -102,25 +102,72 @@
           },
           "mappings": []
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bug"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "feature"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "complaint"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 8,
+        "h": 7,
+        "w": 9,
+        "x": 7,
         "y": 1
       },
       "id": 2,
       "options": {
         "displayLabels": [
-          "percent",
-          "name"
+          "percent"
         ],
         "legend": {
           "displayMode": "table",
           "placement": "right",
+          "showLegend": true,
           "values": [
-            "value"
+            "value",
+            "percent"
           ]
         },
         "pieType": "donut",
@@ -136,7 +183,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "10.0.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -146,6 +193,7 @@
           "editorMode": "code",
           "expr": "sum by (category) (tickets_processed_total)",
           "instant": true,
+          "legendFormat": "{{category}}",
           "range": false,
           "refId": "A"
         }
@@ -167,7 +215,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "Count",
             "axisPlacement": "auto",
             "fillOpacity": 80,
             "gradientMode": "none",
@@ -195,10 +243,56 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "high"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "medium"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "low"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
+        "h": 7,
         "w": 8,
         "x": 16,
         "y": 1
@@ -215,7 +309,7 @@
           "showLegend": true
         },
         "orientation": "auto",
-        "showValue": "auto",
+        "showValue": "always",
         "stacking": "none",
         "tooltip": {
           "mode": "single",
@@ -224,7 +318,7 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
-      "pluginVersion": "10.0.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -234,6 +328,7 @@
           "editorMode": "code",
           "expr": "sum by (priority) (tickets_processed_total)",
           "instant": true,
+          "legendFormat": "{{priority}}",
           "range": false,
           "refId": "A"
         }
@@ -255,10 +350,10 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "Tickets / Sec",
+            "axisLabel": "Tickets",
             "axisPlacement": "auto",
             "drawStyle": "line",
-            "fillOpacity": 15,
+            "fillOpacity": 20,
             "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
@@ -299,7 +394,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 8
       },
       "id": 4,
       "options": {
@@ -314,7 +409,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "10.0.0",
+      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -322,13 +417,14 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(tickets_processed_total[1m])",
+          "expr": "tickets_processed_total",
           "instant": false,
+          "legendFormat": "{{category}} ({{priority}})",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Ticket Ingestion Rate",
+      "title": "Ticket Ingestion Activity",
       "type": "timeseries"
     }
   ],
@@ -355,6 +451,6 @@
   "timezone": "",
   "title": "Feedback Tickets - CloudOps Analytics Dashboard",
   "uid": "tickets-analytics-dashboard",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
