@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Copy 1: Deep Dive Master Guide</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; line-height: 1.6; padding: 2rem; max-width: 900px; margin: auto; }
+    h1 { color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    h2 { color: #c084fc; margin-top: 2rem; }
+    h3 { color: #38bdf8; margin-top: 1rem; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .highlight { background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+    code { background: #090d16; color: #38bdf8; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; }
+    ul { margin-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.4rem; }
+  </style>
+</head>
+<body>
+  <h1>📖 Copy 1: Deep Dive Master Guide</h1>
+  <div class="card">
+    <h2>Project Big-Picture Overview</h2>
+    <div class="highlight">
+      <p><strong>In plain English:</strong> Whenever a feedback ticket (a JSON text file) is uploaded to an AWS cloud storage bucket (S3), three automated microservices (AWS Lambda) wake up in milliseconds. They validate the ticket, categorize whether it is a bug, feature request, or complaint, score its priority, store it in a database (DynamoDB), archive a backup copy, and send live metrics to a real-time monitoring dashboard (Grafana) — engineered strictly to cost <strong>$0.00 / month</strong>.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Week 1: Cloud Foundations & IaC (Terraform)</h2>
+    <ul>
+      <li><strong>Infrastructure as Code (IaC):</strong> Codified infrastructure in <code>.tf</code> files.</li>
+      <li><strong>Amazon S3:</strong> Dual bucket architecture (raw drop-zone inbox + processed backup archive).</li>
+      <li><strong>Amazon DynamoDB:</strong> Serverless NoSQL table with <code>PAY_PER_REQUEST</code> billing for $0 cost.</li>
+      <li><strong>AWS IAM:</strong> Role-based access control with least privilege execution policies.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Week 2: Event-Driven Serverless ETL Pipeline</h2>
+    <ul>
+      <li><strong>Extractor Lambda:</strong> Triggered by S3 <code>ObjectCreated</code> event $\rightarrow$ validates JSON schema.</li>
+      <li><strong>Transformer Lambda:</strong> Heuristic keyword categorization and priority scoring $\rightarrow$ assigns UUID.</li>
+      <li><strong>Loader Lambda:</strong> Writes record to DynamoDB and archives JSON copy to S3 partitioned by date.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Week 3: Containerization & AWS ECR (Docker)</h2>
+    <ul>
+      <li><strong>Dockerized Lambdas:</strong> Built from official AWS Python base images; supports up to 10 GB payloads.</li>
+      <li><strong>AWS ECR:</strong> Hosted container images in private Amazon Elastic Container Registry repositories.</li>
+      <li><strong>Lessons Learned:</strong> Fixed multi-arch OCI manifest rejection by adding <code>--platform linux/amd64 --provenance=false</code>.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Week 4: CI/CD Automation (GitHub Actions)</h2>
+    <ul>
+      <li><strong>CI Workflow:</strong> Flake8 linting, Pytest automated unit testing, and Terraform validation.</li>
+      <li><strong>CD Workflow:</strong> Automated Docker buildx image push to ECR and <code>terraform apply -auto-approve</code>.</li>
+      <li><strong>Remote S3 Backend:</strong> Unified state in S3 bucket so cloud runners and local machines share state.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Week 5: Observability Stack (Prometheus & Grafana)</h2>
+    <ul>
+      <li><strong>Prometheus Pushgateway:</strong> Metrics collection bridge for short-lived serverless executions.</li>
+      <li><strong>Prometheus:</strong> Scrapes Pushgateway and stores time-series metric streams.</li>
+      <li><strong>Grafana:</strong> Real-time dashboard showing throughput, category donut charts, and severity bars.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Week 6: Automation Scripts & Final Polish</h2>
+    <ul>
+      <li><strong>Traffic Simulator:</strong> <code>simulate_traffic.ps1</code> sends realistic batches for live interview demos.</li>
+      <li><strong>Teardown Automation:</strong> <code>teardown.ps1</code> destroys all cloud resources with zero-spend guarantee.</li>
+    </ul>
+  </div>
+</body>
+</html>

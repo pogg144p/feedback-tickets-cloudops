@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Copy 2: Interview Cheatsheet & Q&A Prep</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; line-height: 1.6; padding: 2rem; max-width: 900px; margin: auto; }
+    h1 { color: #4ade80; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    h2 { color: #38bdf8; margin-top: 1.5rem; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .pitch { background: rgba(74, 222, 128, 0.1); border-left: 4px solid #4ade80; padding: 1rem; border-radius: 0 4px 4px 0; font-style: italic; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+    th, td { border: 1px solid #334155; padding: 0.6rem; text-align: left; }
+    th { background: #0f172a; color: #38bdf8; }
+    .qa-box { background: #0b1120; border: 1px solid #334155; border-radius: 6px; padding: 1rem; margin-bottom: 1rem; }
+    .q { color: #38bdf8; font-weight: bold; margin-bottom: 0.5rem; }
+    .a { color: #cbd5e1; }
+  </style>
+</head>
+<body>
+  <h1>🎯 Copy 2: Interview Cheatsheet & Q&A Prep</h1>
+  
+  <div class="card">
+    <h2>The 60-Second Elevator Pitch</h2>
+    <div class="pitch">
+      "I designed and built an event-driven serverless data analytics platform on AWS that automatically ingests, categorizes, and monitors customer feedback tickets with zero infrastructure cost. When JSON tickets land in S3, they trigger a chain of containerized Python Lambda microservices managed via Terraform that classify issues, assign severity priorities, and load records into DynamoDB. I built a full CI/CD pipeline using GitHub Actions that runs unit tests and automated linting, builds Docker images for AWS ECR, and applies Terraform infrastructure changes using a remote S3 backend. For observability, I deployed a Prometheus, Pushgateway, and Grafana monitoring stack using Docker Compose to visualize pipeline throughput, category distributions, and error rates in real time."
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>6-Week Quick Reference Matrix</h2>
+    <table>
+      <thead>
+        <tr><th>Phase</th><th>Technologies</th><th>What It Accomplished</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>W1</strong></td><td>Terraform, S3, DynamoDB</td><td>Declarative IaC, Dual S3 buckets, Pay-per-request NoSQL</td></tr>
+        <tr><td><strong>W2</strong></td><td>Python, Lambda, Boto3</td><td>Event-driven serverless ETL pipeline with automated trigger</td></tr>
+        <tr><td><strong>W3</strong></td><td>Docker, AWS ECR, Buildx</td><td>Containerized Lambdas, Layer caching, <code>--provenance=false</code></td></tr>
+        <tr><td><strong>W4</strong></td><td>GitHub Actions, Pytest, S3 State</td><td>CI automated testing/linting + CD continuous deploy with S3 remote state</td></tr>
+        <tr><td><strong>W5</strong></td><td>Prometheus, Pushgateway, Grafana</td><td>Serverless metric push telemetry & live analytics dashboard</td></tr>
+        <tr><td><strong>W6</strong></td><td>PowerShell, Teardown</td><td>Traffic load simulation & automated zero-spend teardown</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Top 10 Technical Interview Questions & Answers</h2>
+    <div class="qa-box">
+      <div class="q">Q1: Why AWS Lambda over EC2?</div>
+      <div class="a">Cost, scaling, and zero server maintenance. Lambda scales from 0 to thousands instantly, runs in milliseconds, and is 100% free within 1M requests/month.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q2: Why containerized Lambdas over ZIP?</div>
+      <div class="a">Eliminates the 250MB size limit (allows up to 10GB payloads), allows custom OS packages, and creates a unified packaging standard across ECS/EKS/Lambda.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q3: Why Prometheus Pushgateway for Lambda?</div>
+      <div class="a">Prometheus is pull-based. Lambda runs for only 500ms and dies. Pushgateway acts as an intermediary cache where Lambda pushes metrics before terminating.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q4: Why Terraform Remote S3 Backend in CI/CD?</div>
+      <div class="a">GitHub Actions runs on fresh Ubuntu VMs with no local state file. Storing state in S3 gives local engineers and CI runners a single shared source of truth.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q5: How did you secure credentials in GitHub Actions?</div>
+      <div class="a">Used GitHub Encrypted Secrets (AES-256), excluded sensitive files via <code>.gitignore</code>, and enabled GitHub Secret Scanning Push Protection.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q6: How does the ETL data flow work?</div>
+      <div class="a">S3 upload triggers Extractor (schema validation) $\rightarrow$ async invokes Transformer (keyword heuristic categorization & priority) $\rightarrow$ async invokes Loader (DynamoDB write + S3 date-partitioned archive).</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q7: Why DynamoDB over RDS/Postgres?</div>
+      <div class="a">Tickets are semi-structured JSON documents. DynamoDB is serverless, fast, zero-maintenance, and offers 25 GB permanent free storage with <code>PAY_PER_REQUEST</code>.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q8: What Docker Lambda manifest error occurred and how was it solved?</div>
+      <div class="a">Lambda rejected multi-arch index attestations. Fixed by adding <code>--platform linux/amd64 --provenance=false</code> to generate clean Docker v2 images.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q9: What does CI validate before deploy?</div>
+      <div class="a">Flake8 code linting, Pytest unit tests on transformer logic, and Terraform format check & validation.</div>
+    </div>
+    <div class="qa-box">
+      <div class="q">Q10: How do you guarantee $0.00 spend?</div>
+      <div class="a">Architected within free tier limits (Lambda, S3, DynamoDB, ECR), local Docker Compose observability, and an automated <code>teardown.ps1</code> script.</div>
+    </div>
+  </div>
+</body>
+</html>

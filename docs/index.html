@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudOps Project Study Portal | Copy 1 & Copy 2</title>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --accent-purple: #c084fc;
+      --accent-red: #f87171;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border-color: #334155;
+      --card-bg: rgba(30, 41, 59, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    /* Tabs Navigation */
+    .tabs-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      position: sticky;
+      top: 1rem;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 0.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent-blue);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--accent-blue), #0284c7);
+      color: #0f172a;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards and Sections */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .badge-blue { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+    .badge-green { background: rgba(74, 222, 128, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .badge-orange { background: rgba(251, 146, 60, 0.2); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
+    .badge-purple { background: rgba(192, 132, 252, 0.2); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+
+    h2 { font-size: 1.5rem; color: var(--text-primary); }
+    h3 { font-size: 1.2rem; color: var(--accent-blue); margin: 1.25rem 0 0.5rem 0; }
+
+    p { margin-bottom: 1rem; color: var(--text-secondary); }
+    strong { color: var(--text-primary); }
+
+    ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1.25rem;
+      color: var(--text-secondary);
+    }
+
+    li { margin-bottom: 0.5rem; }
+
+    /* Code Blocks */
+    pre, code {
+      font-family: "Fira Code", Consolas, Monaco, monospace;
+    }
+
+    pre {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+    }
+
+    p code, li code {
+      background: #090d16;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      color: var(--accent-blue);
+      font-size: 0.85rem;
+      border: 1px solid #1e293b;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border: 1px solid var(--border-color);
+    }
+
+    th {
+      background: var(--bg-secondary);
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: rgba(30, 41, 59, 0.3);
+    }
+
+    /* Accordion / Q&A */
+    .qa-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .qa-question {
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .qa-question:hover {
+      background: var(--bg-secondary);
+      color: var(--accent-blue);
+    }
+
+    .qa-question::after {
+      content: '+';
+      font-size: 1.25rem;
+      color: var(--accent-blue);
+      transition: transform 0.2s;
+    }
+
+    .qa-item.open .qa-question::after {
+      content: '−';
+    }
+
+    .qa-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background: #0b1120;
+      padding: 0 1.25rem;
+      color: #cbd5e1;
+      border-top: 1px solid transparent;
+    }
+
+    .qa-item.open .qa-answer {
+      max-height: 500px;
+      padding: 1rem 1.25rem;
+      border-top-color: var(--border-color);
+    }
+
+    /* Service Callout Box */
+    .service-tag {
+      color: var(--accent-orange);
+      font-weight: bold;
+    }
+
+    .highlight-box {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent-blue);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.25rem 0;
+    }
+
+    /* Print styling */
+    @media print {
+      body { background: #fff; color: #000; padding: 0; }
+      .tabs-nav { display: none; }
+      .tab-content { display: block !important; margin-bottom: 3rem; }
+      .card { border: 1px solid #ccc; box-shadow: none; }
+      .qa-answer { max-height: none !important; padding: 1rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Serverless CloudOps Data Platform</h1>
+      <p class="subtitle">Complete 6-Week Engineering Theory & Technical Interview Guide</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('copy1')">
+        <span>📖 Copy 1: Deep Dive Master Guide</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('copy2')">
+        <span>🎯 Copy 2: Interview Cheatsheet & Q&A</span>
+      </button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: COPY 1 DEEP DIVE MASTER GUIDE       -->
+    <!-- ========================================== -->
+    <div id="copy1" class="tab-content active">
+
+      <!-- Overview Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-purple">System Architecture</span>
+          <h2>Project Big-Picture Overview</h2>
+        </div>
+        <p>You built an <strong>Event-Driven Serverless Data Pipeline Platform</strong>.</p>
+        <div class="highlight-box">
+          <p><strong>In plain English:</strong> Whenever a feedback ticket (a JSON text file) is uploaded to an AWS cloud storage bucket (S3), three automated microservices (AWS Lambda) wake up in milliseconds. They validate the ticket, categorize whether it is a bug, feature request, or complaint, score its priority, store it in a database (DynamoDB), archive a backup copy, and send live metrics to a real-time monitoring dashboard (Grafana) — engineered strictly to cost <strong>$0.00 / month</strong>.</p>
+        </div>
+      </div>
+
+      <!-- Week 1 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-blue">Week 1</span>
+          <h2>Cloud Foundations & Infrastructure as Code (IaC)</h2>
+        </div>
+        <h3>Key Services & Concepts:</h3>
+        <ul>
+          <li><strong>Infrastructure as Code / IaC</strong>: Writing machine-readable config files to define cloud resources instead of clicking buttons in web consoles.</li>
+          <li><strong>Terraform</strong> <span class="service-tag">(HashiCorp IaC Tool)</span>: Declarative engine that provisions and manages cloud resources automatically.</li>
+          <li><strong>Amazon S3</strong> <span class="service-tag">(AWS Simple Storage Service)</span>: Highly durable object storage. Created 2 buckets: <code>raw-inbox</code> (ticket drop zone) and <code>processed-archive</code>.</li>
+          <li><strong>Amazon DynamoDB</strong> <span class="service-tag">(AWS Serverless NoSQL Database)</span>: Fast, managed key-value database configured with <code>PAY_PER_REQUEST</code> billing for $0.00 idle cost.</li>
+          <li><strong>AWS IAM</strong> <span class="service-tag">(Identity & Access Management)</span>: Security service managing roles, policies, and permissions using the principle of least privilege.</li>
+          <li><strong>AWS Named Profiles</strong>: Local CLI configuration mapping project credentials to an isolated profile name (<code>tickets</code>).</li>
+        </ul>
+        <h3>Core Terraform Files:</h3>
+        <p><code>provider.tf</code> (AWS provider & region), <code>variables.tf</code> (reusable params), <code>main.tf</code> (S3 & DynamoDB resources), <code>outputs.tf</code> (prints resource names on completion).</p>
+      </div>
+
+      <!-- Week 2 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-blue">Week 2</span>
+          <h2>Event-Driven Serverless ETL Pipeline</h2>
+        </div>
+        <h3>Key Services & Concepts:</h3>
+        <ul>
+          <li><strong>Serverless Computing</strong>: Running code on-demand without provisioning or paying for idle virtual servers.</li>
+          <li><strong>AWS Lambda</strong> <span class="service-tag">(Serverless Compute)</span>: Event-triggered microservices executing business logic in milliseconds.</li>
+          <li><strong>Event-Driven Trigger</strong>: S3 detects an <code>s3:ObjectCreated:*</code> event on JSON upload and invokes Extractor Lambda automatically.</li>
+          <li><strong>Boto3</strong>: Official AWS Python SDK allowing Python code to interact with S3, DynamoDB, and Lambda.</li>
+        </ul>
+        <h3>The 3 Lambda Microservices:</h3>
+        <ol style="margin-left: 1.5rem; color: var(--text-secondary);">
+          <li style="margin-bottom: 0.5rem;"><strong>Extractor</strong> (<code>extractor/handler.py</code>): Triggered by S3 upload $\rightarrow$ parses JSON $\rightarrow$ validates required fields (<code>user</code>, <code>email</code>, <code>issue</code>) $\rightarrow$ async invokes Transformer.</li>
+          <li style="margin-bottom: 0.5rem;"><strong>Transformer</strong> (<code>transformer/handler.py</code>): Heuristic keyword analysis $\rightarrow$ assigns Category (<code>bug</code>, <code>feature</code>, <code>complaint</code>) $\rightarrow$ assigns Priority (<code>high</code>, <code>medium</code>, <code>low</code>) $\rightarrow$ generates UUID Ticket ID $\rightarrow$ async invokes Loader.</li>
+          <li style="margin-bottom: 0.5rem;"><strong>Loader</strong> (<code>loader/handler.py</code>): Writes record to DynamoDB $\rightarrow$ archives JSON copy to S3 partitioned by date (<code>processed/YYYY/MM/DD/ticket.json</code>).</li>
+        </ol>
+      </div>
+
+      <!-- Week 3 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-blue">Week 3</span>
+          <h2>Containerization & AWS ECR</h2>
+        </div>
+        <h3>Why Containers for Lambda?</h3>
+        <ul>
+          <li><strong>Overcomes Size Limitations</strong>: ZIP files are capped at 250 MB; Container images allow up to <strong>10 GB</strong> payloads.</li>
+          <li><strong>System Dependencies</strong>: Ability to include custom OS-level packages and libraries.</li>
+          <li><strong>Unified Standard</strong>: Same packaging format across Lambda, ECS, and Kubernetes.</li>
+        </ul>
+        <h3>Services & Debugging Journeys:</h3>
+        <ul>
+          <li><strong>AWS ECR</strong> <span class="service-tag">(Elastic Container Registry)</span>: Private container repository.</li>
+          <li><strong>Docker Layer Caching</strong>: Base Python images cached across builds, speeding up subsequent builds from 77s to 2.5s.</li>
+          <li><strong>Bug 1 (IAM Authorization)</strong>: Added <code>AmazonEC2ContainerRegistryFullAccess</code> to fix <code>ecr:CreateRepository</code> denial.</li>
+          <li><strong>Bug 2 (Windows Pipe Line Endings)</strong>: PowerShell stdin pipe mangled token bytes. Resolved with <code>docker login -u AWS -p (...)</code>.</li>
+          <li><strong>Bug 3 (OCI Image Manifest)</strong>: AWS Lambda rejected multi-arch index manifests. Fixed with <code>--platform linux/amd64 --provenance=false</code>.</li>
+        </ul>
+      </div>
+
+      <!-- Week 4 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-blue">Week 4</span>
+          <h2>CI/CD Automation with GitHub Actions</h2>
+        </div>
+        <h3>The Dual CI/CD Pipelines:</h3>
+        <ul>
+          <li><strong>CI Workflow (<code>ci.yml</code>)</strong>: Triggered on Pull Requests/Pushes $\rightarrow$ runs Flake8 linting $\rightarrow$ executes Pytest unit tests (<code>test_transformer.py</code>) $\rightarrow$ checks Terraform syntax format and validation.</li>
+          <li><strong>CD Workflow (<code>cd.yml</code>)</strong>: Triggered on merge to <code>main</code> $\rightarrow$ authenticates with AWS via GitHub Encrypted Secrets $\rightarrow$ builds Docker images with Buildx $\rightarrow$ pushes to AWS ECR $\rightarrow$ runs <code>terraform apply -auto-approve</code>.</li>
+          <li><strong>Remote S3 Terraform Backend</strong>: Stored state file in a dedicated S3 bucket so local machines and ephemeral GitHub Actions runners share a single source of truth without resource collision.</li>
+        </ul>
+      </div>
+
+      <!-- Week 5 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-blue">Week 5</span>
+          <h2>Observability Stack (Prometheus & Grafana)</h2>
+        </div>
+        <h3>Serverless Observability Architecture:</h3>
+        <ul>
+          <li><strong>Prometheus Pushgateway</strong>: Bridge for ephemeral microservices. Lambda pushes short metric events upon finishing; Prometheus scrapes Pushgateway on a recurring 5s polling loop.</li>
+          <li><strong>Prometheus</strong>: Time-series database storing ticket metric events.</li>
+          <li><strong>Grafana</strong>: Visualization UI configured with automated dashboard provisioning and custom PromQL queries.</li>
+          <li><strong>Docker Compose</strong>: Runs Prometheus, Pushgateway, and Grafana in an isolated local bridge network (<code>monitoring-net</code>).</li>
+        </ul>
+      </div>
+
+      <!-- Week 6 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-blue">Week 6</span>
+          <h2>Automation Scripts & Final Polish</h2>
+        </div>
+        <ul>
+          <li><strong><code>simulate_traffic.ps1</code></strong>: Automated PowerShell load generator simulating realistic tickets into S3 and metrics to Grafana for interview demonstrations.</li>
+          <li><strong><code>teardown.ps1</code></strong>: Empties S3 buckets and executes <code>terraform destroy -auto-approve</code> for a zero-spend guarantee.</li>
+          <li><strong><code>README.md</code></strong>: Complete repository documentation with workflow badges, ASCII diagrams, and quickstart commands.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: COPY 2 INTERVIEW CHEATSHEET & Q&A   -->
+    <!-- ========================================== -->
+    <div id="copy2" class="tab-content">
+
+      <!-- Elevator Pitch -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-green">Pitch</span>
+          <h2>The 60-Second Elevator Pitch</h2>
+        </div>
+        <div class="highlight-box">
+          <p><em>"I designed and built an event-driven serverless data analytics platform on AWS that automatically ingests, categorizes, and monitors customer feedback tickets with zero infrastructure cost.</em></p>
+          <p><em>When JSON tickets land in S3, they trigger a chain of containerized Python Lambda microservices managed via Terraform that classify issues, assign severity priorities, and load records into DynamoDB.</em></p>
+          <p><em>I built a full CI/CD pipeline using GitHub Actions that runs unit tests and automated linting, builds Docker images for AWS ECR, and applies Terraform infrastructure changes using a remote S3 backend.</em></p>
+          <p><em>For observability, I deployed a Prometheus, Pushgateway, and Grafana monitoring stack using Docker Compose to visualize pipeline throughput, category distributions, and error rates in real time."</em></p>
+        </div>
+      </div>
+
+      <!-- 6-Week Table Summary -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-orange">Quick Reference</span>
+          <h2>6-Week Architecture Matrix</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Technologies</th>
+              <th>What It Accomplished</th>
+              <th>Core Keywords</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>W1</strong></td>
+              <td>Terraform, S3, DynamoDB, IAM</td>
+              <td>IaC foundation, dual buckets, NoSQL DB, IAM roles</td>
+              <td>Declarative IaC, <code>PAY_PER_REQUEST</code>, Least Privilege</td>
+            </tr>
+            <tr>
+              <td><strong>W2</strong></td>
+              <td>Python, Lambda, S3 Events, Boto3</td>
+              <td>Extractor $\rightarrow$ Transformer $\rightarrow$ Loader ETL pipeline</td>
+              <td>Serverless, Event-Driven, Async Invocation</td>
+            </tr>
+            <tr>
+              <td><strong>W3</strong></td>
+              <td>Docker, AWS ECR, Buildx</td>
+              <td>Containerized Lambdas, ECR repositories</td>
+              <td>OCI Manifests, Layer Caching, <code>--provenance=false</code></td>
+            </tr>
+            <tr>
+              <td><strong>W4</strong></td>
+              <td>GitHub Actions, Pytest, S3 State</td>
+              <td>Automated unit tests, linting, continuous deploy</td>
+              <td>CI/CD, GitHub Secrets, Remote S3 Backend</td>
+            </tr>
+            <tr>
+              <td><strong>W5</strong></td>
+              <td>Prometheus, Pushgateway, Grafana</td>
+              <td>Real-time metric telemetry & visual dashboard</td>
+              <td>Push vs Pull, PromQL, Ephemeral Telemetry</td>
+            </tr>
+            <tr>
+              <td><strong>W6</strong></td>
+              <td>PowerShell, Teardown, Markdown</td>
+              <td>Traffic simulation script, 1-click teardown</td>
+              <td>Zero-Spend Guarantee, Automation Scripting</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Top 10 Interview Q&A Accordion -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge badge-purple">Interview Prep</span>
+          <h2>Top 10 Technical Interview Questions & Answers</h2>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">1. Why did you choose AWS Lambda over running on an EC2 instance?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> Cost, scalability, and operational overhead. An EC2 instance incurs cost 24/7 even when idle and requires OS patching and scaling group management. Lambda is completely serverless — it scales from zero to thousands of concurrent executions automatically, runs only when a ticket arrives, executes in milliseconds, and fits completely within the AWS Free Tier (1M free requests/month).</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">2. Why did you containerize your Lambda functions instead of using standard ZIP files?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> Standard Lambda ZIP deployments have a 250 MB unzipped size limitation and restrict you to AWS's pre-configured runtimes. Container images allow up to 10 GB payloads, enabling custom system libraries and heavy machine learning dependencies, while standardizing our packaging format across Lambda, ECS, and Kubernetes environments.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">3. Why did you need Prometheus Pushgateway instead of having Prometheus scrape Lambda directly?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> Prometheus uses a pull model, scraping long-running target endpoints every 15–30 seconds. Lambda functions are ephemeral microservices that spin up, execute in 500 milliseconds, and terminate. Pushgateway acts as an intermediary metrics cache — Lambda pushes its metric event upon completion via HTTP POST, and Prometheus scrapes Pushgateway on its standard polling interval.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">4. Why is a Terraform Remote S3 Backend necessary in a CI/CD pipeline?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> When running Terraform locally, state is stored in a local <code>terraform.tfstate</code> file. In CI/CD, GitHub Actions spins up on a fresh, ephemeral Ubuntu runner that has no local files. Without a remote backend, Terraform wouldn't know the infrastructure exists and would attempt to recreate existing resources, causing conflicts. Storing state in S3 provides a single, persistent source of truth shared between local machines and CI/CD runners.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">5. How did you secure your credentials in GitHub Actions?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> I used GitHub Encrypted Secrets (<code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code>), which are encrypted at rest with AES-256 and masked in logs. Furthermore, <code>.gitignore</code> was configured to block all <code>*.csv</code>, <code>*.pem</code>, <code>*.tfstate</code>, and <code>.env</code> files from ever entering source control, and GitHub's Secret Push Protection was enabled to prevent accidental leaks.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">6. How does data flow through the ETL pipeline?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> A client uploads a raw JSON ticket to the raw S3 bucket. S3 emits an <code>ObjectCreated</code> event triggering the Extractor Lambda. Extractor validates the schema and asynchronously invokes Transformer. Transformer uses heuristic keyword analysis to classify category (<code>bug</code>, <code>feature</code>, <code>complaint</code>) and priority (<code>high</code>, <code>medium</code>, <code>low</code>), generates a UUID ticket ID, and invokes Loader. Loader saves the record into DynamoDB for fast queries and writes an archive copy into the processed S3 bucket organized by date.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">7. Why did you use DynamoDB instead of a relational database like PostgreSQL / RDS?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> Feedback tickets are semi-structured JSON objects that map naturally to a NoSQL document model. DynamoDB is fully serverless with single-digit millisecond latency, requires zero database server administration, and offers 25 GB of permanent free storage with <code>PAY_PER_REQUEST</code> billing, whereas RDS instances incur hourly costs outside the 12-month free tier window.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">8. What error did you encounter when building Docker containers for AWS Lambda and how did you resolve it?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> AWS Lambda gave an <code>InvalidParameterValueException: The image manifest media type is not supported</code>. Modern Docker Desktop uses Buildx with multi-architecture OCI indexes and build attestations by default. AWS Lambda requires single-architecture Docker v2 schema 2 images. I resolved this by passing <code>--platform linux/amd64 --provenance=false</code> during <code>docker build</code>, producing clean, compatible container manifests.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">9. What does your CI pipeline validate before allowing code to deploy?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> The CI workflow enforces three gates: first, Flake8 lints all Python code for syntax and complexity issues; second, Pytest executes automated unit tests against the Transformer categorization and priority logic; third, Terraform CLI runs <code>terraform fmt -check</code> and <code>terraform validate</code> to ensure IaC formatting and syntax validity.</p>
+          </div>
+        </div>
+
+        <div class="qa-item">
+          <div class="qa-question" onclick="toggleQA(this)">10. How do you ensure this project stays at $0.00 spend on AWS?</div>
+          <div class="qa-answer">
+            <p><strong>Answer:</strong> Every service was specifically chosen within AWS Free Tier limits: Lambda provides 1M free requests/month, S3 includes 5 GB storage, DynamoDB provides 25 GB permanent free storage, and ECR offers 500 MB storage. Monitoring is self-hosted locally via Docker Compose rather than paying for managed CloudWatch alarms. Additionally, I wrote a <code>teardown.ps1</code> script that empties S3 buckets and runs <code>terraform destroy</code> to tear down all cloud resources when not in use.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function toggleQA(element) {
+      const parent = element.parentElement;
+      parent.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
