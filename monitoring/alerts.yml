@@ -1,0 +1,52 @@
+# monitoring/alerts.yml
+# ─────────────────────────────────────────────────────────────
+# Prometheus Alerting Rules for CloudOps Ticket Pipeline
+# ─────────────────────────────────────────────────────────────
+
+groups:
+  - name: ticket_pipeline_alerts
+    rules:
+      # ── Rule 1: Surge in High-Priority Bugs ─────────────────
+      - alert: CriticalBugSpikeDetected
+        expr: rate(tickets_processed_total{category="bug", priority="high"}[5m]) > 0.5
+        for: 1m
+        labels:
+          severity: critical
+          tier: application
+        annotations:
+          summary: "Abnormal surge in high-priority critical bugs"
+          description: "High-priority bug ingestion rate is {{ $value | humanize }} tickets/sec over the last 5 minutes. Immediate investigation required."
+          runbook_url: "https://github.com/pogg144p/feedback-tickets-cloudops/wiki/Runbook#critical-bugs"
+
+      # ── Rule 2: Ingestion Pipeline Error Rate ──────────────
+      - alert: PipelineProcessingFailureRateHigh
+        expr: rate(tickets_processing_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          tier: infrastructure
+        annotations:
+          summary: "Pipeline error rate elevated"
+          description: "Processing error rate is {{ $value }} errors/sec. Check AWS Lambda CloudWatch logs for Extractor/Transformer crashes."
+
+      # ── Rule 3: Processing Latency Spike ────────────────────
+      - alert: TicketProcessingLatencyHigh
+        expr: histogram_quantile(0.95, sum(rate(ticket_processing_duration_seconds_bucket[5m])) by (le)) > 5.0
+        for: 3m
+        labels:
+          severity: warning
+          tier: performance
+        annotations:
+          summary: "p95 ticket processing latency exceeds 5 seconds"
+          description: "95th percentile of ticket processing time is currently {{ $value | humanizeDuration }}. Check DynamoDB provisioned/on-demand throttling."
+
+      # ── Rule 4: Monitoring Scrape Target Down ──────────────
+      - alert: MonitoringTargetUnreachable
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: page
+          tier: observability
+        annotations:
+          summary: "Scrape target {{ $labels.instance }} is down"
+          description: "Prometheus could not scrape {{ $labels.job }} for more than 1 minute."

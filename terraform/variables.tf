@@ -25,3 +25,24 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+# ── Alerting Variables ─────────────────────────────────────────
+
+variable "alert_email" {
+  description = "Email address to receive critical bug alerts via SNS"
+  type        = string
+  default     = ""
+}
+
+variable "telegram_bot_token" {
+  description = "Telegram Bot API token (from @BotFather) for instant push alerts"
+  type        = string
+  default     = ""
+  sensitive   = true # won't be shown in terraform plan output
+}
+
+variable "telegram_chat_id" {
+  description = "Your Telegram chat ID (the bot sends alerts to this chat)"
+  type        = string
+  default     = ""
+}

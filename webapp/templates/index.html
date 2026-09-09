@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Feedback Ticket | CloudOps Pipeline{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header Hero -->
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
+            Live Ticket Ingestion Portal
+        </h1>
+        <p class="mt-2 text-sm text-slate-400">
+            Submit an issue below. Your payload drops directly into <span class="text-indigo-400 font-mono">S3 raw bucket</span>, 
+            triggering our event-driven Lambda ETL pipeline to categorize and prioritize it in real-time.
+        </p>
+    </div>
+
+    <!-- Submission Card -->
+    <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl">
+        <form action="{{ url_for('submit_ticket') }}" method="POST" class="space-y-6">
+            <div>
+                <label for="customer_id" class="block text-sm font-medium text-slate-300">Customer / User ID (Optional)</label>
+                <div class="mt-1">
+                    <input type="text" name="customer_id" id="customer_id" placeholder="e.g. cust-9041 (auto-generated if empty)"
+                        class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <div>
+                <label for="subject" class="block text-sm font-medium text-slate-300">Issue Subject <span class="text-rose-400">*</span></label>
+                <div class="mt-1">
+                    <input type="text" name="subject" id="subject" required placeholder="e.g. App crashes during checkout"
+                        class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+            </div>
+
+            <div>
+                <label for="description" class="block text-sm font-medium text-slate-300">Detailed Description <span class="text-rose-400">*</span></label>
+                <div class="mt-1">
+                    <textarea name="description" id="description" rows="4" required placeholder="Describe what happened or suggest a feature..."
+                        class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                </div>
+            </div>
+
+            <!-- Quick Template Fill Buttons -->
+            <div class="pt-2">
+                <p class="text-xs text-slate-400 mb-2 font-medium">Quick Demo Samples (Click to auto-fill):</p>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="fillSample('bug')" class="px-3 py-1.5 rounded bg-rose-950/60 border border-rose-800 text-rose-300 text-xs hover:bg-rose-900/60 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-bug"></i>
+                        <span>Critical Bug Sample</span>
+                    </button>
+                    <button type="button" onclick="fillSample('feature')" class="px-3 py-1.5 rounded bg-sky-950/60 border border-sky-800 text-sky-300 text-xs hover:bg-sky-900/60 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>Feature Request Sample</span>
+                    </button>
+                    <button type="button" onclick="fillSample('billing')" class="px-3 py-1.5 rounded bg-amber-950/60 border border-amber-800 text-amber-300 text-xs hover:bg-amber-900/60 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Billing Inquiry Sample</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-700/60 flex items-center justify-between">
+                <span class="text-xs text-slate-500">Auto-routes to S3 & triggers Extractor Lambda</span>
+                <button type="submit" class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-500/25 flex items-center space-x-2">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Submit to CloudOps Pipeline</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function fillSample(type) {
+    const sub = document.getElementById('subject');
+    const desc = document.getElementById('description');
+    if (type === 'bug') {
+        sub.value = 'Fatal application crash when tapping submit on payment page';
+        desc.value = 'User reported 500 error code and freeze during final step. App terminated immediately. Requires urgent hotfix.';
+    } else if (type === 'feature') {
+        sub.value = 'Requesting AMOLED true dark mode theme option';
+        desc.value = 'Would love an option in profile preferences to enable pure black AMOLED theme for saving battery.';
+    } else if (type === 'billing') {
+        sub.value = 'Discrepancy in monthly subscription invoice charge';
+        desc.value = 'My card was billed twice for the standard plan on September 1st. Please reverse the duplicate charge.';
+    }
+}
+</script>
+{% endblock %}

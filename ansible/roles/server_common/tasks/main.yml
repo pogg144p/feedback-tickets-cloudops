@@ -1,0 +1,81 @@
+---
+# roles/server_common/tasks/main.yml
+# ─────────────────────────────────────────────────────────────
+# Role: server_common
+# Purpose: System update, utility packages, deploy user & security
+# ─────────────────────────────────────────────────────────────
+
+- name: Update apt repository cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade all packages to their latest version
+  ansible.builtin.apt:
+    upgrade: dist
+    autoremove: true
+    clean: true
+
+- name: Install baseline system utilities and security tools
+  ansible.builtin.apt:
+    name:
+      - curl
+      - wget
+      - git
+      - htop
+      - ufw
+      - fail2ban
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - net-tools
+      - unzip
+    state: present
+
+- name: Ensure deploy user group exists
+  ansible.builtin.group:
+    name: deployer
+    state: present
+
+- name: Create dedicated deployer user with bash shell
+  ansible.builtin.user:
+    name: deployer
+    group: deployer
+    groups: sudo
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Configure passwordless sudo for deployer user
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/deployer
+    line: "deployer ALL=(ALL) NOPASSWD:ALL"
+    create: true
+    mode: '0440'
+    validate: 'visudo -cf %s'
+
+- name: Configure UFW default incoming policy to deny
+  community.general.ufw:
+    direction: incoming
+    default: deny
+
+- name: Configure UFW default outgoing policy to allow
+  community.general.ufw:
+    direction: outgoing
+    default: allow
+
+- name: Allow SSH port 22 through UFW
+  community.general.ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+
+- name: Enable UFW service
+  community.general.ufw:
+    state: enabled
+
+- name: Ensure fail2ban is running and enabled on boot
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: started
+    enabled: true

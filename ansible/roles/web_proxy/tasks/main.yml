@@ -1,0 +1,49 @@
+---
+# roles/web_proxy/tasks/main.yml
+# ─────────────────────────────────────────────────────────────
+# Role: web_proxy
+# Purpose: NGINX installation, reverse proxy config & firewall
+# ─────────────────────────────────────────────────────────────
+
+- name: Install NGINX web server
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+
+- name: Remove default Nginx site configuration
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Reload Nginx
+
+- name: Deploy custom reverse proxy virtual host template
+  ansible.builtin.template:
+    src: app.conf.j2
+    dest: /etc/nginx/sites-available/app.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Nginx
+
+- name: Enable custom virtual host via symbolic link
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/app.conf
+    dest: /etc/nginx/sites-enabled/app.conf
+    state: link
+  notify: Reload Nginx
+
+- name: Allow HTTP and HTTPS traffic through UFW firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - '80'
+    - '443'
+
+- name: Ensure Nginx service is running and enabled on boot
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: true

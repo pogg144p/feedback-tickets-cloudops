@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickets-app-deployment
+  namespace: tickets-cloudops
+  labels:
+    app: tickets-app
+    tier: frontend-api
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # Allow 1 extra pod during rollout
+      maxUnavailable: 0  # Zero downtime: always keep minimum required pods healthy
+  selector:
+    matchLabels:
+      app: tickets-app
+  template:
+    metadata:
+      labels:
+        app: tickets-app
+        tier: frontend-api
+    spec:
+      containers:
+        - name: tickets-service
+          image: 768229077155.dkr.ecr.us-east-1.amazonaws.com/feedback-tickets-loader:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http-server
+
+          # Environment configuration from ConfigMap & Secret
+          envFrom:
+            - configMapRef:
+                name: tickets-app-config
+            - secretRef:
+                name: tickets-app-secrets
+
+          # Resource allocation & limits (prevents noisy neighbors)
+          resources:
+            requests:
+              cpu: "100m"      # 0.1 vCPU
+              memory: "128Mi"
+            limits:
+              cpu: "500m"      # 0.5 vCPU
+              memory: "256Mi"
+
+          # Health check probes for automated self-healing
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL

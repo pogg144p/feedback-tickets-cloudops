@@ -1,0 +1,51 @@
+# monitoring/alertmanager.yml
+# ─────────────────────────────────────────────────────────────
+# Prometheus Alertmanager Configuration
+# ─────────────────────────────────────────────────────────────
+
+global:
+  resolve_timeout: 5m
+
+# The root route on which each incoming alert enters
+route:
+  group_by: ['alertname', 'severity', 'tier']
+  group_wait: 10s        # Initial delay to batch incoming alerts together
+  group_interval: 30s    # Time to wait before sending batched notifications
+  repeat_interval: 2h    # Resend interval for active alerts
+  receiver: 'default-webhook-receiver'
+
+  routes:
+    # Route critical pages immediately
+    - match:
+        severity: page
+      receiver: 'pager-receiver'
+      continue: true
+
+    # Route critical application bugs
+    - match:
+        severity: critical
+      receiver: 'critical-incident-receiver'
+
+receivers:
+  - name: 'default-webhook-receiver'
+    webhook_configs:
+      - url: 'http://localhost:5001/alerts/webhook'
+        send_resolved: true
+
+  - name: 'critical-incident-receiver'
+    webhook_configs:
+      - url: 'http://localhost:5001/alerts/critical'
+        send_resolved: true
+
+  - name: 'pager-receiver'
+    webhook_configs:
+      - url: 'http://localhost:5001/alerts/pager'
+        send_resolved: true
+
+inhibit_rules:
+  # Inhibit warning alerts if a critical alert is already firing for the same tier
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['tier']

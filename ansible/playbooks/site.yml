@@ -1,0 +1,27 @@
+---
+# playbooks/site.yml
+# ─────────────────────────────────────────────────────────────
+# Master Orchestration Playbook
+# Provisions and standardizes EC2 infrastructure in order:
+#   1. Base OS setup, security hardening, firewall (all servers)
+#   2. Docker container runtime installation (app servers)
+#   3. NGINX reverse proxy & web serving (web servers)
+# ─────────────────────────────────────────────────────────────
+
+- name: Apply baseline security and system tools to all nodes
+  hosts: all
+  become: true
+  roles:
+    - server_common
+
+- name: Provision container runtime on application nodes
+  hosts: appservers
+  become: true
+  roles:
+    - docker_engine
+
+- name: Provision reverse proxy and routing on web nodes
+  hosts: webservers
+  become: true
+  roles:
+    - web_proxy

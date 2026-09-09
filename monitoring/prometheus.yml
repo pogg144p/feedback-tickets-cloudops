@@ -10,6 +10,16 @@ global:
   scrape_interval: 5s
   evaluation_interval: 5s
 
+# Load alerting rules once and periodically evaluate them according to 'evaluation_interval'
+rule_files:
+  - 'alerts.yml'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:

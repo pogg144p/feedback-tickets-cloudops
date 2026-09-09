@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Live Pipeline Feed | CloudOps Dashboard{% endblock %}
+
+{% block content %}
+<div>
+    <!-- Top Stats Ribbon -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
+        <div class="glass-card rounded-xl p-4 border border-slate-800">
+            <div class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Processed</div>
+            <div class="text-2xl font-bold text-white mt-1">{{ stats.total }}</div>
+        </div>
+        <div class="glass-card rounded-xl p-4 border border-rose-900/50 bg-rose-950/20">
+            <div class="text-xs font-medium text-rose-400 uppercase tracking-wider">Bugs Identified</div>
+            <div class="text-2xl font-bold text-rose-300 mt-1">{{ stats.bugs }}</div>
+        </div>
+        <div class="glass-card rounded-xl p-4 border border-sky-900/50 bg-sky-950/20">
+            <div class="text-xs font-medium text-sky-400 uppercase tracking-wider">Feature Requests</div>
+            <div class="text-2xl font-bold text-sky-300 mt-1">{{ stats.features }}</div>
+        </div>
+        <div class="glass-card rounded-xl p-4 border border-amber-900/50 bg-amber-950/20">
+            <div class="text-xs font-medium text-amber-400 uppercase tracking-wider">Billing Tickets</div>
+            <div class="text-2xl font-bold text-amber-300 mt-1">{{ stats.billing }}</div>
+        </div>
+        <div class="glass-card rounded-xl p-4 border border-purple-900/50 bg-purple-950/20 col-span-2 sm:col-span-1">
+            <div class="text-xs font-medium text-purple-400 uppercase tracking-wider">High Priority</div>
+            <div class="text-2xl font-bold text-purple-300 mt-1">{{ stats.high_priority }}</div>
+        </div>
+    </div>
+
+    <!-- Live Feed Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div>
+            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                <span>DynamoDB Operational Feed</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-950 text-emerald-300 border border-emerald-800">
+                    <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-400 rounded-full animate-ping"></span>
+                    Live Stream
+                </span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Real-time records enriched by Transformer Lambda and loaded into DynamoDB</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="window.location.reload()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700 transition flex items-center space-x-1">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Refresh</span>
+            </button>
+            <a href="{{ url_for('index') }}" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white transition flex items-center space-x-1">
+                <i class="fa-solid fa-plus"></i>
+                <span>New Ticket</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="glass-card rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-800 text-left text-sm">
+                <thead class="bg-slate-900/80 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-4 py-3">Ticket ID</th>
+                        <th class="px-4 py-3">Subject & Summary</th>
+                        <th class="px-4 py-3">Category</th>
+                        <th class="px-4 py-3">Priority</th>
+                        <th class="px-4 py-3">Customer</th>
+                        <th class="px-4 py-3">Processed At</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 bg-slate-900/30">
+                    {% if tickets %}
+                        {% for ticket in tickets %}
+                        <tr class="hover:bg-slate-800/40 transition">
+                            <td class="px-4 py-3 whitespace-nowrap font-mono text-xs text-indigo-300 font-semibold">
+                                {{ ticket.ticket_id }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="font-medium text-white max-w-xs truncate">{{ ticket.subject }}</div>
+                                <div class="text-xs text-slate-400 max-w-sm truncate mt-0.5">{{ ticket.description }}</div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                {% if ticket.category == 'bug' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-950/80 text-rose-300 border border-rose-800">
+                                        <i class="fa-solid fa-bug mr-1"></i> Bug
+                                    </span>
+                                {% elif ticket.category == 'feature_request' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-950/80 text-sky-300 border border-sky-800">
+                                        <i class="fa-solid fa-lightbulb mr-1"></i> Feature
+                                    </span>
+                                {% elif ticket.category == 'billing' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-950/80 text-amber-300 border border-amber-800">
+                                        <i class="fa-solid fa-receipt mr-1"></i> Billing
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                                        General
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                {% if ticket.priority == 'high' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-950 text-purple-300 border border-purple-800">
+                                        HIGH
+                                    </span>
+                                {% elif ticket.priority == 'medium' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-950/70 text-amber-300 border border-amber-800/80">
+                                        MEDIUM
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                                        LOW
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap font-mono text-xs text-slate-400">
+                                {{ ticket.customer_id or '—' }}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-xs text-slate-400 font-mono">
+                                {{ ticket.processed_at[:19].replace('T', ' ') if ticket.processed_at else '—' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-4 py-12 text-center text-slate-500">
+                                <i class="fa-solid fa-inbox text-3xl mb-3 block text-slate-600"></i>
+                                <p class="text-sm font-medium">No tickets recorded in DynamoDB yet.</p>
+                                <a href="{{ url_for('index') }}" class="mt-2 inline-block text-xs text-indigo-400 hover:underline">Submit the first ticket &rarr;</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-refresh feed every 15 seconds to display newly ingested pipeline records
+setTimeout(function() {
+    window.location.reload();
+}, 15000);
+</script>
+{% endblock %}

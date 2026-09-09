@@ -1,0 +1,15 @@
+---
+# roles/web_proxy/handlers/main.yml
+# ─────────────────────────────────────────────────────────────
+# Handlers run only when notified by tasks that made changes
+# ─────────────────────────────────────────────────────────────
+
+- name: Reload Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded
+
+- name: Restart Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted

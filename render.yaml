@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: feedback-tickets-cloudops
+    runtime: docker
+    dockerfilePath: ./webapp/Dockerfile
+    dockerContext: ./webapp
+    plan: free
+    region: oregon
+    healthCheckPath: /healthz
+    envVars:
+      - key: AWS_DEFAULT_REGION
+        value: us-east-1
+      - key: S3_RAW_BUCKET
+        value: feedback-tickets-raw-dev-768229077155
+      - key: DYNAMODB_TABLE
+        value: feedback-tickets-table-dev
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false

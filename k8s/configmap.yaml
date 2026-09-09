@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tickets-app-config
+  namespace: tickets-cloudops
+  labels:
+    app: tickets-app
+data:
+  AWS_DEFAULT_REGION: "us-east-1"
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  DYNAMODB_TABLE_NAME: "feedback-tickets-table-dev"
+  S3_PROCESSED_BUCKET: "feedback-tickets-processed-dev-768229077155"
+  PROMETHEUS_PUSHGATEWAY: "http://tickets-pushgateway:9091"

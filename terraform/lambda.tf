@@ -111,6 +111,9 @@ resource "aws_lambda_function" "loader" {
     variables = {
       DYNAMODB_TABLE_NAME   = aws_dynamodb_table.tickets.name
       PROCESSED_BUCKET_NAME = aws_s3_bucket.processed_tickets.bucket
+      SNS_TOPIC_ARN         = aws_sns_topic.critical_alerts.arn
+      TELEGRAM_BOT_TOKEN    = var.telegram_bot_token
+      TELEGRAM_CHAT_ID      = var.telegram_chat_id
     }
   }
 

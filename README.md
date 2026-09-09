@@ -64,11 +64,41 @@
 | **Terraform (IaC)** | Declarative infrastructure as code managing S3 buckets, DynamoDB tables, IAM execution roles, ECR repositories, and S3 event triggers with S3 remote backend. |
 | **AWS Lambda** | Event-driven microservices (`Extractor`, `Transformer`, `Loader`) executing serverless business logic in milliseconds. |
 | **Docker & AWS ECR** | Containerized Lambda functions packaged using official `public.ecr.aws/lambda/python:3.12` base images with multi-layer build caching. |
+| **Kubernetes (K8s)** | Production manifests (`k8s/`) for Deployments (rolling zero-downtime updates), Services, Ingress, ConfigMaps, and Horizontal Pod Autoscaling (HPA). |
+| **Ansible** | Automated configuration management & OS hardening (`ansible/`) with modular roles for baseline security (UFW/fail2ban), Docker CE runtime, and NGINX reverse proxy. |
+| **Apache Airflow** | Batch data orchestration (`orchestration/`) using the modern TaskFlow API with automated retries, dependency DAGs, and partitioned S3 archiving. |
 | **GitHub Actions (CI/CD)**| **CI:** Flake8 linting, Pytest unit tests, `terraform fmt`, `terraform validate`.<br>**CD:** Automated Docker image build/push to ECR, and `terraform apply -auto-approve` with remote state synchronization. |
-| **Prometheus & Pushgateway**| Time-series metric collection and ingestion for ephemeral serverless executions. |
+| **Prometheus & Alertmanager**| Real-time time-series metrics scraping and PromQL alerting rules with deduplication and alert fatigue inhibition. |
 | **Grafana** | Production-grade observability dashboard visualizing live ingestion rates, category breakdowns, and priority distributions. |
 | **DynamoDB & S3** | NoSQL queryable database (Pay-Per-Request) and dual-bucket raw drop zone + processed audit archives. |
 | **PowerShell & Bash** | Automated deployment, traffic simulation, and teardown scripts. |
+
+---
+
+## 🌟 Advanced DevOps & Data Engineering Modules
+
+This repository is architected across multiple enterprise cloud paradigms:
+
+### 1. ☸️ Kubernetes Orchestration (`k8s/`)
+- **Zero-Downtime Rollouts:** Configured `RollingUpdate` strategy with `maxSurge: 1` and `maxUnavailable: 0`.
+- **Self-Healing Probes:** Independent HTTP `livenessProbe` and `readinessProbe` targeting `/healthz`.
+- **Autoscaling:** `HorizontalPodAutoscaler` dynamically scaling from 2 to 10 pods when CPU utilization crosses 70%, with a 5-minute cooldown to prevent flapping.
+- See full documentation in [`k8s/README.md`](k8s/README.md).
+
+### 2. 🤖 Ansible Server Automation (`ansible/`)
+- **Modular Roles:** `server_common` (UFW firewall, fail2ban, deployer sudo user), `docker_engine` (official Docker CE repo, compose plugin), and `web_proxy` (NGINX Jinja2 reverse proxy).
+- **Idempotency:** Safe dry-run execution using `--check` mode.
+- See full documentation in [`ansible/README.md`](ansible/README.md).
+
+### 3. 🌪️ Apache Airflow Orchestration (`orchestration/`)
+- **TaskFlow DAG:** Clean Python `@dag` and `@task` decoratored pipeline orchestrating extraction from S3, NLP classification, and multi-sink writes.
+- **Fault-Tolerant:** Automatic 3x retries with exponential backoff on intermittent network disruptions.
+- See full documentation in [`orchestration/README.md`](orchestration/README.md).
+
+### 4. 🚨 Incident Response & Alertmanager (`monitoring/`)
+- **PromQL Rules (`alerts.yml`):** Dynamic thresholds for `CriticalBugSpikeDetected`, `PipelineProcessingFailureRateHigh`, and p95 latency breaches.
+- **Alertmanager Routing (`alertmanager.yml`):** Grouping, deduplication, and `inhibit_rules` preventing alert fatigue during major outages.
+- See full documentation in [`monitoring/README.md`](monitoring/README.md).
 
 ---
 

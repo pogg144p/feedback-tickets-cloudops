@@ -17,6 +17,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts.yml:/etc/prometheus/alerts.yml:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -24,6 +25,21 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     depends_on:
       - pushgateway
+      - alertmanager
+    networks:
+      - monitoring-net
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: tickets-alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
     networks:
       - monitoring-net
 
