@@ -50,18 +50,21 @@ def submit_ticket():
     Submits a ticket into the raw S3 ingestion bucket,
     which automatically triggers the serverless ETL pipeline.
     """
-    customer_id = request.form.get("customer_id", "").strip() or f"cust-{uuid.uuid4().hex[:4]}"
-    subject = request.form.get("subject", "").strip()
-    description = request.form.get("description", "").strip()
+    user = request.form.get("user", "").strip() or f"user-{uuid.uuid4().hex[:4]}"
+    email = request.form.get("email", "").strip() or "noemail@portal.com"
+    issue = request.form.get("issue", "").strip()
+    severity = request.form.get("severity", "medium")
 
-    if not subject or not description:
-        flash("Subject and description cannot be empty!", "error")
+    if not issue:
+        flash("Issue description cannot be empty!", "error")
         return redirect(url_for("index"))
 
     ticket_payload = {
-        "customer_id": customer_id,
-        "subject": subject,
-        "description": description,
+        "user": user,
+        "email": email,
+        "issue": issue,
+        "severity": severity,
+        "submitted_via": "web_portal",
         "submitted_at": datetime.now(timezone.utc).isoformat()
     }
 
@@ -97,14 +100,14 @@ def live_tickets():
         stats = {
             "total": len(items),
             "bugs": sum(1 for i in items if i.get("category") == "bug"),
-            "features": sum(1 for i in items if i.get("category") == "feature_request"),
-            "billing": sum(1 for i in items if i.get("category") == "billing"),
+            "features": sum(1 for i in items if i.get("category") == "feature"),
+            "complaints": sum(1 for i in items if i.get("category") == "complaint"),
             "high_priority": sum(1 for i in items if i.get("priority") == "high"),
         }
     except Exception as e:
         logger.error(f"DynamoDB scan error: {e}")
         items = []
-        stats = {"total": 0, "bugs": 0, "features": 0, "billing": 0, "high_priority": 0}
+        stats = {"total": 0, "bugs": 0, "features": 0, "complaints": 0, "high_priority": 0}
         flash(f"Unable to load tickets from DynamoDB: {str(e)}", "error")
 
     is_processing = request.args.get("processing") == "1"

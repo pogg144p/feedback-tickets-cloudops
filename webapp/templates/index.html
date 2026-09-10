@@ -17,28 +17,41 @@
 
     <!-- Submission Card -->
     <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl">
-        <form action="{{ url_for('submit_ticket') }}" method="POST" class="space-y-6">
-            <div>
-                <label for="customer_id" class="block text-sm font-medium text-slate-300">Customer / User ID (Optional)</label>
-                <div class="mt-1">
-                    <input type="text" name="customer_id" id="customer_id" placeholder="e.g. cust-9041 (auto-generated if empty)"
-                        class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+        <form action="{{ url_for('submit_ticket') }}" method="POST" class="space-y-6" id="ticket-form">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="user" class="block text-sm font-medium text-slate-300">Your Name <span class="text-rose-400">*</span></label>
+                    <div class="mt-1">
+                        <input type="text" name="user" id="user" required placeholder="e.g. John Smith"
+                            class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-300">Email Address <span class="text-rose-400">*</span></label>
+                    <div class="mt-1">
+                        <input type="email" name="email" id="email" required placeholder="e.g. john@example.com"
+                            class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
                 </div>
             </div>
 
             <div>
-                <label for="subject" class="block text-sm font-medium text-slate-300">Issue Subject <span class="text-rose-400">*</span></label>
+                <label for="issue" class="block text-sm font-medium text-slate-300">Issue Description <span class="text-rose-400">*</span></label>
                 <div class="mt-1">
-                    <input type="text" name="subject" id="subject" required placeholder="e.g. App crashes during checkout"
-                        class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                </div>
-            </div>
-
-            <div>
-                <label for="description" class="block text-sm font-medium text-slate-300">Detailed Description <span class="text-rose-400">*</span></label>
-                <div class="mt-1">
-                    <textarea name="description" id="description" rows="4" required placeholder="Describe what happened or suggest a feature..."
+                    <textarea name="issue" id="issue" rows="4" required placeholder="Describe your bug, feature request, complaint, or question in detail..."
                         class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                </div>
+            </div>
+
+            <div>
+                <label for="severity" class="block text-sm font-medium text-slate-300">Severity</label>
+                <div class="mt-1">
+                    <select name="severity" id="severity"
+                        class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="low">Low — minor issue, no urgency</option>
+                        <option value="medium" selected>Medium — affects workflow</option>
+                        <option value="high">High — critical, blocks usage</option>
+                    </select>
                 </div>
             </div>
 
@@ -54,15 +67,15 @@
                         <i class="fa-solid fa-lightbulb"></i>
                         <span>Feature Request Sample</span>
                     </button>
-                    <button type="button" onclick="fillSample('billing')" class="px-3 py-1.5 rounded bg-amber-950/60 border border-amber-800 text-amber-300 text-xs hover:bg-amber-900/60 transition flex items-center space-x-1">
-                        <i class="fa-solid fa-receipt"></i>
-                        <span>Billing Inquiry Sample</span>
+                    <button type="button" onclick="fillSample('complaint')" class="px-3 py-1.5 rounded bg-amber-950/60 border border-amber-800 text-amber-300 text-xs hover:bg-amber-900/60 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Complaint Sample</span>
                     </button>
                 </div>
             </div>
 
             <div class="pt-4 border-t border-slate-700/60 flex items-center justify-between">
-                <span class="text-xs text-slate-500">Auto-routes to S3 & triggers Extractor Lambda</span>
+                <span class="text-xs text-slate-500">Auto-routes to S3 &amp; triggers Extractor Lambda</span>
                 <button type="submit" id="submit-btn" class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-500/25 flex items-center space-x-2">
                     <i id="btn-icon" class="fa-solid fa-bolt"></i>
                     <span id="btn-text">Submit to CloudOps Pipeline</span>
@@ -73,7 +86,7 @@
 </div>
 
 <script>
-document.querySelector('form').addEventListener('submit', function() {
+document.getElementById('ticket-form').addEventListener('submit', function() {
     const btn = document.getElementById('submit-btn');
     const icon = document.getElementById('btn-icon');
     const text = document.getElementById('btn-text');
@@ -91,17 +104,25 @@ document.querySelector('form').addEventListener('submit', function() {
     }, 1000);
 });
 function fillSample(type) {
-    const sub = document.getElementById('subject');
-    const desc = document.getElementById('description');
+    const user = document.getElementById('user');
+    const email = document.getElementById('email');
+    const issue = document.getElementById('issue');
+    const severity = document.getElementById('severity');
     if (type === 'bug') {
-        sub.value = 'Fatal application crash when tapping submit on payment page';
-        desc.value = 'User reported 500 error code and freeze during final step. App terminated immediately. Requires urgent hotfix.';
+        user.value = 'Alex Johnson';
+        email.value = 'alex.johnson@example.com';
+        issue.value = 'Fatal application crash when tapping submit on payment page. User reported 500 error code and freeze during final checkout step. App terminated immediately. Requires urgent hotfix.';
+        severity.value = 'high';
     } else if (type === 'feature') {
-        sub.value = 'Requesting AMOLED true dark mode theme option';
-        desc.value = 'Would love an option in profile preferences to enable pure black AMOLED theme for saving battery.';
-    } else if (type === 'billing') {
-        sub.value = 'Discrepancy in monthly subscription invoice charge';
-        desc.value = 'My card was billed twice for the standard plan on September 1st. Please reverse the duplicate charge.';
+        user.value = 'Priya Sharma';
+        email.value = 'priya.sharma@example.com';
+        issue.value = 'Requesting AMOLED true dark mode theme option. Would love an option in profile preferences to enable pure black AMOLED theme for saving battery on mobile devices.';
+        severity.value = 'low';
+    } else if (type === 'complaint') {
+        user.value = 'Marcus Lee';
+        email.value = 'marcus.lee@example.com';
+        issue.value = 'Discrepancy in monthly subscription invoice charge. My card was billed twice for the standard plan this month. Please investigate and reverse the duplicate charge as soon as possible.';
+        severity.value = 'medium';
     }
 }
 </script>
