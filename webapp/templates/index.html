@@ -63,9 +63,9 @@
 
             <div class="pt-4 border-t border-slate-700/60 flex items-center justify-between">
                 <span class="text-xs text-slate-500">Auto-routes to S3 & triggers Extractor Lambda</span>
-                <button type="submit" class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-500/25 flex items-center space-x-2">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>Submit to CloudOps Pipeline</span>
+                <button type="submit" id="submit-btn" class="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition shadow-lg shadow-indigo-500/25 flex items-center space-x-2">
+                    <i id="btn-icon" class="fa-solid fa-bolt"></i>
+                    <span id="btn-text">Submit to CloudOps Pipeline</span>
                 </button>
             </div>
         </form>
@@ -73,6 +73,23 @@
 </div>
 
 <script>
+document.querySelector('form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    const icon = document.getElementById('btn-icon');
+    const text = document.getElementById('btn-text');
+    
+    // Disable button to prevent double submit
+    btn.disabled = true;
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+    icon.className = 'fa-solid fa-arrows-rotate animate-spin';
+    
+    let sec = 1;
+    text.textContent = 'Ingesting to S3 (' + sec + 's)...';
+    setInterval(function() {
+        sec++;
+        text.textContent = 'Ingesting to S3 (' + sec + 's)...';
+    }, 1000);
+});
 function fillSample(type) {
     const sub = document.getElementById('subject');
     const desc = document.getElementById('description');

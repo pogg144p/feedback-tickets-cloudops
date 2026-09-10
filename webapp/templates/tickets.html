@@ -28,6 +28,49 @@
         </div>
     </div>
 
+    <!-- Live Processing Banner with Stopwatch (triggers after ticket submission) -->
+    {% if is_processing %}
+    <div id="pipeline-alert" class="mb-6 glass-card rounded-2xl p-5 border border-indigo-500/40 bg-gradient-to-r from-indigo-950/60 via-purple-950/40 to-slate-900/60 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start space-x-3">
+                <div class="mt-0.5 p-2 rounded-lg bg-indigo-600/30 border border-indigo-500 text-indigo-400">
+                    <i class="fa-solid fa-arrows-rotate animate-spin text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                        <span>Event-Driven Serverless Pipeline Active</span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-900/80 text-indigo-300 border border-indigo-700">
+                            AWS Lambda Executing
+                        </span>
+                    </h3>
+                    <p id="pipeline-step-text" class="text-xs text-slate-300 mt-1 font-mono">
+                        [Step 1/3] Ingesting JSON into S3 landing bucket...
+                    </p>
+                    <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2.5 max-w-md overflow-hidden">
+                        <div id="pipeline-progress-bar" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-1000 ease-linear" style="width: 15%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Stopwatch Badge -->
+            <div class="flex items-center space-x-3 self-end sm:self-center">
+                <div class="text-right">
+                    <div class="text-[10px] uppercase font-semibold tracking-wider text-slate-400">Pipeline Latency</div>
+                    <div class="flex items-center space-x-1.5 mt-0.5">
+                        <i class="fa-regular fa-clock text-indigo-400 text-xs"></i>
+                        <span id="stopwatch-display" class="font-mono text-lg font-extrabold text-indigo-300">01s</span>
+                    </div>
+                </div>
+                <div class="h-8 w-px bg-slate-700/60"></div>
+                <div class="text-right">
+                    <div class="text-[10px] uppercase font-semibold tracking-wider text-slate-400">Auto Refresh In</div>
+                    <div id="countdown-display" class="font-mono text-lg font-extrabold text-emerald-400 mt-0.5">06s</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Live Feed Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
@@ -41,7 +84,8 @@
             <p class="text-xs text-slate-400 mt-1">Real-time records enriched by Transformer Lambda and loaded into DynamoDB</p>
         </div>
         <div class="flex items-center space-x-3">
-            <button onclick="window.location.reload()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700 transition flex items-center space-x-1">
+            <span class="text-xs text-slate-400 font-mono hidden sm:inline" id="feed-ticker">Synced just now</span>
+            <button onclick="window.location.href='{{ url_for('live_tickets') }}'" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700 transition flex items-center space-x-1">
                 <i class="fa-solid fa-arrows-rotate"></i>
                 <span>Refresh</span>
             </button>
@@ -135,9 +179,61 @@
 </div>
 
 <script>
-// Auto-refresh feed every 15 seconds to display newly ingested pipeline records
+{% if is_processing %}
+// ── Stopwatch & Pipeline Step Logic (After Submit) ──
+let elapsedSeconds = 1;
+const totalWait = 7;
+
+const stopwatchDisplay = document.getElementById('stopwatch-display');
+const countdownDisplay = document.getElementById('countdown-display');
+const stepText = document.getElementById('pipeline-step-text');
+const progressBar = document.getElementById('pipeline-progress-bar');
+
+const interval = setInterval(function() {
+    elapsedSeconds++;
+    const remaining = totalWait - elapsedSeconds;
+
+    if (stopwatchDisplay) {
+        stopwatchDisplay.textContent = (elapsedSeconds < 10 ? '0' : '') + elapsedSeconds + 's';
+    }
+    if (countdownDisplay) {
+        countdownDisplay.textContent = (remaining > 0 ? (remaining < 10 ? '0' : '') + remaining : '00') + 's';
+    }
+
+    // Step updates based on elapsed seconds
+    if (elapsedSeconds <= 2) {
+        stepText.textContent = "[Step 1/3] S3 event trigger fired Extractor Lambda...";
+        progressBar.style.width = "35%";
+    } else if (elapsedSeconds <= 4) {
+        stepText.textContent = "[Step 2/3] Transformer Lambda executing NLP classification & priority tagging...";
+        progressBar.style.width = "70%";
+    } else {
+        stepText.textContent = "[Step 3/3] Loader Lambda saving to DynamoDB & S3 date partition...";
+        progressBar.style.width = "95%";
+    }
+
+    if (elapsedSeconds >= totalWait) {
+        clearInterval(interval);
+        window.location.href = "{{ url_for('live_tickets') }}";
+    }
+}, 1000);
+
+{% else %}
+// ── Regular Feed Auto-Refresh & Ticker ──
+let secondsSinceSync = 0;
+const ticker = document.getElementById('feed-ticker');
+
+setInterval(function() {
+    secondsSinceSync++;
+    if (ticker) {
+        ticker.textContent = "Synced " + secondsSinceSync + "s ago";
+    }
+}, 1000);
+
+// Auto-refresh every 20 seconds
 setTimeout(function() {
     window.location.reload();
-}, 15000);
+}, 20000);
+{% endif %}
 </script>
 {% endblock %}

@@ -75,8 +75,8 @@ def submit_ticket():
             ContentType="application/json"
         )
         logger.info(f"Successfully uploaded ticket to s3://{RAW_BUCKET_NAME}/{object_key}")
-        flash(f"Ticket submitted successfully! Ingested into S3 landing bucket. Pipeline is classifying it now.", "success")
-        return redirect(url_for("live_tickets"))
+        flash(f"Ticket submitted successfully! Ingested into S3 landing bucket. Pipeline is processing in the background.", "success")
+        return redirect(url_for("live_tickets", processing="1"))
     except ClientError as e:
         logger.error(f"S3 upload error: {e}")
         flash(f"Failed to submit ticket: {e.response['Error']['Message']}", "error")
@@ -107,7 +107,8 @@ def live_tickets():
         stats = {"total": 0, "bugs": 0, "features": 0, "billing": 0, "high_priority": 0}
         flash(f"Unable to load tickets from DynamoDB: {str(e)}", "error")
 
-    return render_template("tickets.html", tickets=items, stats=stats)
+    is_processing = request.args.get("processing") == "1"
+    return render_template("tickets.html", tickets=items, stats=stats, is_processing=is_processing)
 
 
 @app.route("/api/tickets")
