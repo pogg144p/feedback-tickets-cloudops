@@ -36,10 +36,10 @@ def send_alerts(ticket):
       2. Telegram Bot (instant mobile push notification)
     """
     ticket_id = ticket.get('ticket_id')
-    subject = ticket.get('subject', 'No Subject')
-    description = ticket.get('description', 'No Description')
-    category = ticket.get('category')
-    priority = ticket.get('priority')
+    subject = ticket.get('issue') or ticket.get('subject', 'No Subject')
+    user = ticket.get('user') or ticket.get('customer_id', 'Anonymous')
+    category = ticket.get('category', 'general')
+    priority = ticket.get('priority', 'low')
 
     alert_message = (
         f"🚨 CRITICAL BUG DETECTED\n"
@@ -47,8 +47,8 @@ def send_alerts(ticket):
         f"Ticket ID : {ticket_id}\n"
         f"Category  : {category.upper()}\n"
         f"Priority  : {priority.upper()}\n"
-        f"Subject   : {subject}\n"
-        f"Details   : {description}\n"
+        f"Issue     : {subject}\n"
+        f"Reporter  : {user}\n"
         f"Time      : {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}"
     )
 
